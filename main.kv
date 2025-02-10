@@ -1,0 +1,62 @@
+<MenuScreen>
+    BoxLayout:
+        Button:
+            text: "начать запись трейла"
+            on_press: app.open_gps_recording()
+
+<GpsStartRecordingScreen>:
+    GridLayout:
+        cols:1
+        Button:
+            text: "старт"
+            on_press:
+                app.start_gps() 
+                app.switch_toSTR('GpsStopRecordingScreen')
+
+<GpsStopRecordingScreen>
+    GridLayout:
+        cols:1
+        Button:
+            text: "стоп"
+            on_press:
+                app.stop_gps()
+                app.switch_toSTR('GpsInfoScreen')
+<GpsInfoScreen>
+    GridLayout:
+        cols: 1
+        Image:
+            size_hint: 2, 2
+            source: 'map.jpeg'
+            size: self.texture_size
+        TextInput:
+            size_hint: 0.3, 0.3
+            id: GPSNameInput
+            hint_text: "введите название"
+        TextInput:
+            size_hint: 0.3, 0.3
+            id: GPSDescriptionInput
+            hint_text: "введите описание"
+        TextInput:
+            size_hint: 0.3, 0.3
+            id: GPSMinDistanceInput
+            hint_text: "введите погрешность"
+        Button:
+            size_hint: 0.3, 0.3
+            text: "Сохранить"
+            on_press:app.Save_GPS_to_json()
+
+<TestScreen>
+    GridLayout:
+        cols: 1
+        Label:
+            id: TestLabel
+            text: str(app.GPSJsonDict)
+        Button:
+            size_hint: 0.3, 0.3
+            text: "В меню"
+            on_press: app.switch_toSTR("MenuScreen")
+
+
+        
+
+        
