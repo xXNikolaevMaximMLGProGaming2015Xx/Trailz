@@ -1,8 +1,93 @@
+<Wp@Widget>:
+    pos:(0,0)
+
+<SavedTrail@Wp>
+    name: "test"
+    discription: "test"
+    pos:root.pos
+    FloatLayout:
+        pos:root.pos
+        Label:
+            id:main_text
+            text: root.name
+            pos:root.pos
+        Label:
+            id:sec_text
+            text: root.discription
+            pos:root.pos[0] + root.size[0]/3, root.pos[1] 
+        Button:
+            id:main_button
+            on_press: app.send_own_trail(root.name)
+            text:"загрузить"
+            pos:root.pos[0] + root.size[0]/2 + root.size[0]/3, root.pos[1] 
+            sise:500,root.size[1]
+
+<LoginSignUpScreen>
+    GridLayout:
+        cols:1
+        Button:
+            text: "Логирование"
+            on_press: app.switch_toSTR("LoginScreen")
+        Button:
+            text: "Регистрация"
+            on_press: app.switch_toSTR("SignUpScreen")
+
+<LoginScreen>
+    GridLayout:
+        id:main_layout
+        cols:1
+        Label:
+            text: "Email"
+        TextInput:
+            id: email
+        Label:
+            text:"Пароль"
+        TextInput:
+            id:password
+        Button:
+            text:"Логироваться"
+            on_press:app.login()
+
+        Button:
+            size_hint: 0.3, 0.3
+            text: "Назад"
+            on_press: app.switch_toSTR("LoginSignUpScreen")
+        
+<SignUpScreen>
+    GridLayout:
+        id:main_layout
+        cols:1
+        Label:
+            text: "Email"
+        TextInput:
+            id: email
+        Label:
+            text: "имя пользователя"
+        TextInput:
+            id: username
+        Label:
+            text:"Пароль"
+        TextInput:
+            id:password
+        Button:
+            text:"Регистрация"
+            on_press:app.sign_up()
+        Button:
+            size_hint: 0.3, 0.3
+            text: "Назад"
+            on_press: app.switch_toSTR("LoginSignUpScreen")
+        
+
 <MenuScreen>
     BoxLayout:
+        id: MainLayout
         Button:
             text: "начать запись трейла"
             on_press: app.open_gps_recording()
+        Button:
+            text: "сохранённые трейлы"
+            on_press:
+                app.saved_trails_forward_backward("b", 1,20)
 
 <GpsStartRecordingScreen>:
     GridLayout:
