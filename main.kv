@@ -20,7 +20,69 @@
             on_press: app.send_own_trail(root.name)
             text:"загрузить"
             pos:root.pos[0] + root.size[0]/2 + root.size[0]/3, root.pos[1] 
-            sise:500,root.size[1]
+            sise:500,root.size[1]/3
+            height:50
+            size_hint_y:None
+
+
+
+<PublicTrail@Wp>
+    trail_name: "test"
+    username: "test"
+    date: "test"
+    distance: "test"
+    discription: "test"
+    trail_id: 0
+    pos:root.pos
+    size_hint_y: None
+    FloatLayout:
+        pos:root.pos
+        Label:
+            id:name_text
+            text: root.trail_name
+            pos: 0, root.pos[1] 
+        Label:
+            id:username_text
+            text: root.username
+            pos:root.size[0]/6, root.pos[1] 
+        Label:
+            id:distance_text
+            text: root.distance
+            pos:root.size[0]/3, root.pos[1] 
+        Label:
+            id:date_text
+            text: root.date
+            pos:root.size[0]*2/3, root.pos[1] 
+        Button:
+            id:main_button
+            text:"открыть"
+            pos:root.size[0]*5/6, root.pos[1] 
+            sise:root.size[0]/6,root.size[1]
+            size_hint_y:None
+            on_press:
+                app.open_gps_info_screen(root.trail_name,root.username,root.date,root.distance,root.description,root.trail_id)
+
+<TrailInfoScreen>
+    trail_name: "test"
+    username: "test"
+    date: "test"
+    distance: "test"
+    description: "test"
+    trail_id: 0
+    GridLayout:
+
+        cols:1
+        Label: 
+            text: root.trail_name
+        Label: 
+            text: root.date
+        Label: 
+            text: root.distance
+        Label: 
+            text: root.description
+
+        
+
 
 <LoginSignUpScreen>
     GridLayout:
@@ -76,18 +138,52 @@
             size_hint: 0.3, 0.3
             text: "Назад"
             on_press: app.switch_toSTR("LoginSignUpScreen")
-        
+
+<SavedTrailsScreen>:
+    GridLayout:
+        cols:1
+        Label:
+            text:"Сохранённые трейлы"
+            height:45
+            size_hint_y:None
+            
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            GridLayout:
+                size_hint_y: None
+                id:MainLayout
+                cols:1
+            
+    Button:
+        height:40
+        size_hint_y: None
+        text:"в меню"
+        on_press: app.switch_toSTR("MenuScreen")
+    
 
 <MenuScreen>
-    BoxLayout:
+    GridLayout:
+        cols:1
         id: MainLayout
         Button:
             text: "начать запись трейла"
             on_press: app.open_gps_recording()
+
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            BoxLayout:
+                amount:0
+                spacing:20
+                orientation: 'vertical'
+                height:100 * self.amount + 100
+                size_hint_y: None
+                id:MainLayout
         Button:
             text: "сохранённые трейлы"
             on_press:
-                app.saved_trails_forward_backward("b", 1,20)
+                app.switch_toSTR("SavedTrailsScreen")
 
 <GpsStartRecordingScreen>:
     GridLayout:
