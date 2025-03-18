@@ -20,7 +20,9 @@ if platform == "android":
 
 Builder.load_file(filename='main.kv')
 
-#миксин для классов, работающих с жипиэс
+class GpsStopRecordingScreen2(Screen):
+    pass
+
 class Wp(Widget):
     pass
 
@@ -32,6 +34,9 @@ class PublicTrail(Wp):
 
 
 class TrailInfoScreen(Screen):
+    pass
+
+class StopGpsScreen(Screen):
     pass
 
 class SavedTrailsScreen(Screen):
@@ -81,6 +86,7 @@ class Trailz(App):
         self._jsonTrailPath = "saved_trails/"
         self._MinDistancePar = 1
         self._config = {}
+        self.current_trail_id = ""
     
     def login(self) -> None:
         email = MainScreenManager.get_screen("LoginScreen").ids.email.text
@@ -172,6 +178,8 @@ class Trailz(App):
         MainScreenManager.add_widget(MenuScreen(name='MenuScreen'))
         MainScreenManager.add_widget(GpsInfoScreen(name='GpsInfoScreen'))
         MainScreenManager.add_widget(SavedTrailsScreen(name='SavedTrailsScreen'))
+        MainScreenManager.add_widget(StopGpsScreen(name='SavedTrailsScreen'))
+        MainScreenManager.add_widget(GpsStopRecordingScreen2(name="GpsStopRecordingScreen2"))
         self.creat_own_saved_trails_screen()
         self.create_public_trails_screen()
         MainScreenManager.add_widget(GpsStartRecordingScreen(name='GpsStartRecordingScreen'))
@@ -195,6 +203,22 @@ class Trailz(App):
         return MainScreenManager
     
     
+    def send_public_trail(self,trail_id):
+        MainFileManager.save_public_trail(self._GPSJsonDict)
+        is_valid = MainServerManager.load_public_trail(trail_id)
+        self._GPSJsonDict = {}
+        
+    def start_rerun(self,trail_id):
+        self._GPSJsonDict = {}
+        
+        try: 
+            self.current_trail_id = trail_id
+            self.start_gps()
+            self.switch_toSTR("GpsStopRecordingScreen2")
+
+        except:
+            print("not implemented")
+       
     @staticmethod
     def start_gps():
         gps.start(0,1)
@@ -210,6 +234,9 @@ class Trailz(App):
             #не открывается и может выводить ошибку
             pass 
         
+    def save_public_trail(self):
+        MainFileManager.save_public_trail(self._GPSJsonDict,self.current_trail_id)
+    
     def Save_GPS_to_json(self) -> None:
         if MainScreenManager.get_screen('GpsInfoScreen').ids.GPSNameInput.text != "" and MainScreenManager.get_screen('GpsInfoScreen').ids.GPSDescriptionInput.text != "" and MainScreenManager.get_screen('GpsInfoScreen').ids.GPSMinDistanceInput.text != "":
             self._GPSJsonDict['name'] = MainScreenManager.get_screen('GpsInfoScreen').ids.GPSNameInput.text
@@ -223,8 +250,9 @@ class Trailz(App):
             MainScreenManager.get_screen('TestScreen').ids.TestLabel.text = str(self._GPSJsonDict)
             self.creat_own_saved_trails_screen()
             MainScreenManager.current = 'TestScreen'
+            self._GPSJsonDict = {}
+            
     def open_gps_info_screen(self,name,username,date,distance,description,trail_id):
-        
         MainScreen = MainScreenManager.get_screen("TrailInfoScreen")
         MainScreen.trail_name = name
         MainScreen.username = username
@@ -232,7 +260,6 @@ class Trailz(App):
         MainScreen.distance = distance
         MainScreen.description = description
         MainScreen.trail_id = trail_id
-        print(Fore.RED + str(MainScreenManager.screens))
         MainScreenManager.current = "TrailInfoScreen"
         
         

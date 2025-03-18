@@ -40,7 +40,6 @@ class FileManager():
             json.dump(kwargs,file,ensure_ascii=True)
 
     def save_trail(self,JsonDict, FileName):
-        JsonStr = json.dumps(JsonDict)
         FileName = os.path.join(self.cache_dir,self.own_saved_trails_dir,f"{FileName}.json")
         with open(str(FileName), "w") as file:
             json.dump(JsonDict, file)
@@ -57,12 +56,31 @@ class FileManager():
     
     def load_own_trail(self,trail_name,email,password):
         if f"{trail_name}.json" in os.listdir(self.own_saved_trails_dir):       
-            with open(str(self.own_saved_trails_dir + "/" + f"{trail_name}.json"), "r") as file:
+            with open(os.path.join(self.cache_dir, self.own_saved_trails_dir, trail_name + ".json"), "r") as file:
                 JSON_dict = json.load(file)
                 distance = JSON_dict["distance"]
                 date = JSON_dict["date"]
                 description = JSON_dict["description"]
                 sec_dict = JSON_dict["GPSData"][min(list(JSON_dict["GPSData"].keys()))]
-                MainServerManager.load_own_trail(trail_name,email,distance,date,sec_dict["lat"],sec_dict["lon"],description,password,file)
+                
+            file = open(os.path.join(self.cache_dir, self.own_saved_trails_dir, trail_name + ".json"), "r")
+            MainServerManager.load_own_trail(trail_name,email,distance,date,sec_dict["lat"],sec_dict["lon"],description,password,file)
+            file.close()
             return True
-
+    
+    def save_public_trail(self,JsonDict,trail_id):
+        FileName = "PublicTrail"
+        FileName = os.path.join(self.cache_dir,f"{FileName}.json")
+        config = self.configure()
+        email = config["email"]
+        password = config["password"]
+        with open(str(FileName), "w") as file:
+            json.dump(JsonDict, file)
+        if platform == "android":
+            SharedStorage().copy_to_shared(private_file=FileName)
+        file = open(str(FileName), "r")
+        req = MainServerManager.load_public_trail(trail_id,email,password,file)
+        file.close()
+        return req
+        
+        

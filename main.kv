@@ -70,8 +70,13 @@
     description: "test"
     trail_id: 0
     GridLayout:
-
         cols:1
+        Button:
+            height:40
+            size_hint_y: None
+            text:"в меню"
+            on_press: app.switch_toSTR("MenuScreen")
+
         Label: 
             text: root.trail_name
         Label: 
@@ -80,8 +85,16 @@
             text: root.distance
         Label: 
             text: root.description
+        Button:
+            text: "начать прохождение"
+            on_press: app.start_rerun(root.trail_id)
 
-        
+<StopGpsScreen>
+    GridLayout:
+        cols:1
+        Button:
+            text:"стоп"
+            on_press: app.send_public_trail(), app.stop_gps() 
 
 
 <LoginSignUpScreen>
@@ -200,8 +213,19 @@
         Button:
             text: "стоп"
             on_press:
-                app.stop_gps()
+                app.
                 app.switch_toSTR('GpsInfoScreen')
+
+<GpsStopRecordingScreen2>
+    GridLayout:
+        cols:1
+        Button:
+            text: "стоп"
+            on_press:
+                app.stop_gps()
+                app.save_public_trail()
+                app.switch_toSTR('MenuScreen')
+
 <GpsInfoScreen>
     GridLayout:
         cols: 1
