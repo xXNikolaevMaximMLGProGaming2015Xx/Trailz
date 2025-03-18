@@ -32,6 +32,14 @@ class ServerManager():
             MainRequest = requests.post(url=str(self.BASE_IP + f"/load_rerun/<{trail_id}>/<{password}>/<{email}>"),files={"file":file})
         except:
             pass
+        
+    def get_leaderboard(self,trail_id):
+        try:
+            MainRequest = requests.get(self.BASE_IP + f"/get_leaderboard/{trail_id}").json()
+        except:
+            MainRequest = {"data" : []}
+        return MainRequest["data"]
+        
     
 TestManager = ServerManager()
 

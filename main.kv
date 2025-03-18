@@ -62,6 +62,22 @@
             on_press:
                 app.open_gps_info_screen(root.trail_name,root.username,root.date,root.distance,root.description,root.trail_id)
 
+<UserTime@Wp>
+    username: "test"
+    run_time: "test"
+    trail_id: 0
+    pos:root.pos
+    size_hint_y: None
+    FloatLayout:
+        pos:root.pos
+        Label:
+            text: root.username
+            pos: 0, root.pos[1] 
+        Label:
+            text: root.run_time
+            pos: root.size[0]/2, root.size[1]
+
+
 <TrailInfoScreen>
     trail_name: "test"
     username: "test"
@@ -88,6 +104,17 @@
         Button:
             text: "начать прохождение"
             on_press: app.start_rerun(root.trail_id)
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            BoxLayout:
+                amount:0
+                spacing:20
+                orientation: 'vertical'
+                height:100 * self.amount + 100
+                size_hint_y: None
+                id:MainLayout
+
 
 <StopGpsScreen>
     GridLayout:
@@ -213,7 +240,8 @@
         Button:
             text: "стоп"
             on_press:
-                app.
+                app.stop_gps()
+                app.send_public_trail()
                 app.switch_toSTR('GpsInfoScreen')
 
 <GpsStopRecordingScreen2>

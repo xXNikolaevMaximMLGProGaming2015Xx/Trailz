@@ -14,6 +14,7 @@ import time
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from FileWork import FileManager
 from ServerWorks import ServerManager
+from GpsProcess import *
 from kivy.uix.label import Label
 if platform == "android":
     from plyer import gps
@@ -32,6 +33,8 @@ class SavedTrail(Wp):
 class PublicTrail(Wp):
     pass
 
+class UserTime(Wp):
+    pass
 
 class TrailInfoScreen(Screen):
     pass
@@ -150,6 +153,27 @@ class Trailz(App):
         MainButton.bind(on_press=lambda x:self.create_public_trails_screen(page+1))
         MainScreen.ids.MainLayout.add_widget(MainButton)
         
+    def create_leaderboard_screen(self,page=0):
+        MainScreen = MainScreenManager.get_screen('TrailInfoScreen')
+        MainScreen.ids.MainLayout.clear_widgets()
+        trail_id = MainScreen.trail_id
+        data_list = MainServerManager.get_leaderboard(trail_id)
+        if page != 0 and data_list == []:
+            page -= 2
+        i = 0
+        for data in data_list:
+            user_time = UserTime()
+            MainScreen.ids.MainLayout.ids[f"user_time_{i}"] = user_time
+            MainScreen.ids.MainLayout.ids[f"user_time_{i}"].username = data[0]
+            MainScreen.ids.MainLayout.ids[f"user_time_{i}"].run_time = data[1]
+            MainScreen.ids.MainLayout.add_widget(user_time)
+            i+=1
+            
+        MainScreen.ids.MainLayout.amount = i + 1
+        MainButton = Button(text="загрузить ещё",size_hint_y=None)
+        MainButton.bind(on_press=lambda x:self.create_leaderboard_screen(page+1))
+        MainScreen.ids.MainLayout.add_widget(MainButton)
+    
     def switch_toSTR(self, screenSTR : str) -> None:
         MainScreenManager.current = screenSTR
 
@@ -203,14 +227,13 @@ class Trailz(App):
         return MainScreenManager
     
     
-    def send_public_trail(self,trail_id):
-        MainFileManager.save_public_trail(self._GPSJsonDict)
-        is_valid = MainServerManager.load_public_trail(trail_id)
+    def send_public_trail(self):
+        MainFileManager.save_public_trail(self._GPSJsonDict,self.current_trail_id)
+        is_valid = MainServerManager.load_public_trail(self.current_trail_id)
         self._GPSJsonDict = {}
         
     def start_rerun(self,trail_id):
         self._GPSJsonDict = {}
-        
         try: 
             self.current_trail_id = trail_id
             self.start_gps()
@@ -233,16 +256,13 @@ class Trailz(App):
         else:
             #не открывается и может выводить ошибку
             pass 
-        
-    def save_public_trail(self):
-        MainFileManager.save_public_trail(self._GPSJsonDict,self.current_trail_id)
     
     def Save_GPS_to_json(self) -> None:
         if MainScreenManager.get_screen('GpsInfoScreen').ids.GPSNameInput.text != "" and MainScreenManager.get_screen('GpsInfoScreen').ids.GPSDescriptionInput.text != "" and MainScreenManager.get_screen('GpsInfoScreen').ids.GPSMinDistanceInput.text != "":
             self._GPSJsonDict['name'] = MainScreenManager.get_screen('GpsInfoScreen').ids.GPSNameInput.text
             self._GPSJsonDict['description'] = MainScreenManager.get_screen('GpsInfoScreen').ids.GPSDescriptionInput.text
             self._GPSJsonDict['MinDistance'] = MainScreenManager.get_screen('GpsInfoScreen').ids.GPSMinDistanceInput.text
-            SecDict = GpsProcess.get_gps_info(self._GPSJsonDict)
+            SecDict = get_gps_info(self._GPSJsonDict)
             self._GPSJsonDict["avg_speed"] = SecDict["avg_speed"]
             self._GPSJsonDict["distance"] = SecDict["distance"]
             self._GPSJsonDict["date"] = datetime.today().strftime('%Y-%m-%d')
@@ -262,6 +282,7 @@ class Trailz(App):
         MainScreen.trail_id = trail_id
         MainScreenManager.current = "TrailInfoScreen"
         
+    
         
     @property
     def MinDistanceSetting(self) -> int:
